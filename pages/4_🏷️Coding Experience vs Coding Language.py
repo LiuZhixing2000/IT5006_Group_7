@@ -46,19 +46,25 @@ for title, language_name in languages_name_table.items():
 # drop
 data2020 = data2020[data2020["Coding Experience"] != "I have never written code"]
 data2020.dropna(inplace=True)
+data2020["Coding Experience"].replace({"1-2 years": "1-3 years"}, inplace=True)
 
 # prepare for heatmap
 recording_num2020 = data2020.shape[0]
 heatmap_data2020 = data2020.groupby("Coding Experience").sum().reset_index()
-heatmap_data2020["Coding Experience"] = pd.Categorical(heatmap_data2020["Coding Experience"], categories=["I have never written code", "< 1 years", "1-2 years", "3-5 years", "5-10 years", "10-20 years", "20+ years"], ordered=True)
+heatmap_data2020["Coding Experience"] = pd.Categorical(heatmap_data2020["Coding Experience"], categories=["I have never written code", "< 1 years", "1-3 years", "3-5 years", "5-10 years", "10-20 years", "20+ years"], ordered=True)
 heatmap_data2020.sort_values(by="Coding Experience", inplace=True)
 heatmap_data2020.set_index("Coding Experience", inplace=True)
 heatmap_data2020 = heatmap_data2020 / recording_num2020
 
 heatmap_data2020.drop(columns=["Julia", "Swift", "None"], inplace=True)
 
-plt.figure(figsize=(10,8))
-heatmap_2020 = sns.heatmap(data= heatmap_data2020, fmt=".0%", cmap="crest", annot=True).figure
+
+
+
+
+
+
+
 
 # same to 2021 and 2022
 # 2021
@@ -84,8 +90,11 @@ heatmap_data2021 = heatmap_data2021 / recording_num2021
 
 heatmap_data2021.drop(columns=["Julia", "Swift", "None"], inplace=True)
 
-plt.figure(figsize=(10,8))
-heatmap_2021 = sns.heatmap(data= heatmap_data2021, fmt=".0%", cmap="crest", annot=True).figure
+
+
+
+
+
 
 # 2022
 # Notice: the coding languages are different in 2022's survey
@@ -128,24 +137,135 @@ heatmap_data2022 = heatmap_data2022 / recording_num2022
 
 heatmap_data2022.drop(columns=["Julia", "Go", "None"], inplace=True)
 
-plt.figure(figsize=(10,8))
-heatmap_2022 = sns.heatmap(data= heatmap_data2022, fmt=".0%", cmap="crest", annot=True).figure
+
+# for multi-year visualization
+heatmap_data2020["C#"] = 0.0
+heatmap_data2020["PHP"] = 0.0
+heatmap_data2021["C#"] = 0.0
+heatmap_data2021["PHP"] = 0.0
+
+heatmap_data01 = (heatmap_data2020 * recording_num2020 + heatmap_data2021 * recording_num2021) / (recording_num2020 + recording_num2021)
+heatmap_data02 = (heatmap_data2020 * recording_num2020 + heatmap_data2022 * recording_num2022) / (recording_num2020 + recording_num2022)
+heatmap_data12 = (heatmap_data2021 * recording_num2021 + heatmap_data2022 * recording_num2022) / (recording_num2021 + recording_num2022)
+heatmap_data012 = (heatmap_data2020 * recording_num2020 + heatmap_data2021 * recording_num2021 + heatmap_data2022 * recording_num2022) / (recording_num2020 + recording_num2021 + recording_num2022)
+
+heatmap_data01.drop(columns=["C#", "PHP"], inplace=True)
+heatmap_data2020.drop(columns=["C#", "PHP"], inplace=True)
+heatmap_data2021.drop(columns=["C#", "PHP"], inplace=True)
+order = heatmap_data2022.columns
+heatmap_data02 = heatmap_data02[order]
+heatmap_data12 = heatmap_data12[order]
+heatmap_data012 = heatmap_data12[order]
 
 
 
 
+f2020, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data2020, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2020', fontsize=18, position=(0.5,1.05))
 
 
-st.header("1.2.2 Coding Experience vs Coding Language")
+
+f2021, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data2021, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2021', fontsize=18, position=(0.5,1.05))
+
+
+
+
+f2022, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data2022, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
+
+
+f01, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data01, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
+
+
+f02, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data02, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
+
+
+
+f12, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data12, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
+
+
+
+f012, ax = plt.subplots(figsize = (14, 10))
+#plt.title('The relationship between the code languages and coding experience',fontsize=20)
+cmap = sns.cubehelix_palette(start = 1, rot = 3, gamma=0.8, as_cmap = True)
+#plt.xlabel(u'code languages',fontsize=14)
+sns.heatmap(data= heatmap_data012, fmt=".0%", cmap="RdBu", annot=True, linewidths = 0.05, ax = ax)
+ax.set_xlabel("code languages",fontsize=15)
+ax.set_ylabel("coding experience",fontsize=15)
+ax.tick_params(axis="x",labelsize=12)
+ax.tick_params(axis="y",labelsize=12)
+ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
+
+st.subheader('The relationship between the code languages and coding experience', divider="rainbow")
 
 with st.container():
     option = st.selectbox(
-        "Please select a year:",
-        ("2020", "2021", "2022")
+        "Please select your interested year(s):",
+        ("2020", "2021", "2022", "2020, 2021", "2020, 2022", "2021, 2022", "2020, 2021, and 2022")
     )
     if option == "2020":
-        st.pyplot(heatmap_2020)
+        st.pyplot(f2020)
     elif option == "2021":
-        st.pyplot(heatmap_2021)
+        st.pyplot(f2021)
     elif option == "2022":
-        st.pyplot(heatmap_2022)
+        st.pyplot(f2022)
+    elif option == "2020, 2021":
+        st.pyplot(f01)
+    elif option == "2020, 2022":
+        st.pyplot(f02)
+    elif option == "2021, 2022":
+        st.pyplot(f12)
+    elif option == "2020, 2021, and 2022":
+        st.pyplot(f012)
