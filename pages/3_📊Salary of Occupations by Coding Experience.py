@@ -147,6 +147,7 @@ barplot_data2022["3-10 years"] = (barplot_data2022["3-5 years"] + barplot_data20
 barplot_data2022["10+ years"] = (barplot_data2022["10-20 years"] + barplot_data2022["20+ years"])/2
 barplot_data2022.drop(columns=["I have never written code", "< 1 years", "1-3 years", "3-5 years", "5-10 years", "10-20 years", "20+ years"], inplace=True)
 
+col2020_1_2_1.rename(columns={"1-2 years": "1-3 years"}, inplace=True)
 
 st.subheader("Salary of Occupations by Coding Experience", divider='rainbow')
 
