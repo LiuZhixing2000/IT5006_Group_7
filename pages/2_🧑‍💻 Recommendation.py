@@ -90,8 +90,8 @@ job_activities_map = {
 
 job_skill_map = {
     "Data Engineer": "- **Skill Required**: \
-                    Proficiency in programming languages commonly used , such as Python, Java, Scala, or SQL; \
-                    familiar with databases such as PostgreSQL, MySQL, MongoDB, and Cassandra; \
+                    Proficiency in programming languages commonly used; \
+                    familiar with databases; \
                     ability of designing and implementing data models.",
     "Software Engineer": "- **Skill Required**: \
                     Strong coding ability; \
@@ -99,27 +99,55 @@ job_skill_map = {
                     strong problem-solving skills.",
     "Data Scientist": "- **Skill Required**: \
                     Strong understanding of statistical concepts and methodologies for data analysis; \
-                    expertise in machine learning techniques and algorithms, including supervised and unsupervised learning, regression, clustering, and classification.",
+                    expertise in machine learning techniques and algorithms.",
     "Research Scientist": "- **Skill Required**: \
                     Strong understanding of research methodologies; \
                     ability to design and execute experiments; \
-                    strong critical thinking skills to evaluate and interpret research findings objectively.",
+                    strong critical thinking skills.",
     "Statistician": "- **Skill Required**: \
                     Proficiency in a wide range of statistical methods; \
-                    strong mathematical background like algebra, calculus, and probability theory; \
-                    familiarity with statistical tools such as R, Python (with libraries like NumPy, Pandas, and SciPy), SAS, or SPSS.",
+                    strong mathematical background; \
+                    familiarity with statistical tools.",
     "Data/Business Analyst": "- **Skill Required**: \
                     Knowledge of statistical methods and techniques to analyze data trends and patterns; \
                     familiarity with BI tools such as Tableau, Power BI, QlikView, or Looker.",
     "Machine Learning Engineer": "- **Skill Required**: \
-                    Expertise in using machine learning libraries and frameworks, such as TensorFlow, PyTorch, Scikit-learn, and Keras; \
+                    Expertise in using machine learning libraries and frameworks; \
                     knowledge of various machine learning models and techniques; \
                     ability to evaluate and improve model performance.",
     "Product/Project Manager": "- **Skill Required**: \
-                    Ability to create comprehensive project plans; \
                     ability to analyze data, identify trends, make informed decisions, and address challenges and obstacles; \
                     stay informed about industry trends."
 }
+
+def throw_default_roles(name):
+    role = "Data Scientist"
+    st.markdown("### " + name +", here are your recommended job roles!")
+    st.markdown("💁‍♀️ Our most recommended job role for you is ***" + role + "*** .")
+    st.markdown("##### " + role)
+    
+    from PIL import Image
+    col_icon, col_text = st.columns([0.3, 0.7])
+    with col_icon:
+        image = Image.open(job_icon_map[role])
+        st.image(image)
+    with col_text:
+        st.markdown(job_description_map[role])
+        st.markdown(job_activities_map[role])
+        st.markdown(job_skill_map[role])
+    
+    st.markdown("🙋‍♂️ We also recommend **Data/Business Analyst**.")
+    role = "Data/Business Analyst"
+    col_icon, col_text = st.columns([0.3, 0.7])
+    with col_icon:
+        image = Image.open(job_icon_map[role])
+        st.image(image)
+    with col_text:
+        st.markdown(job_description_map[role])
+        st.markdown(job_activities_map[role])
+        st.markdown(job_skill_map[role])
+    
+    
 
 
 def show_recommendation():
@@ -133,6 +161,9 @@ def show_recommendation():
 
     data = data[~data['job_title'].isin(['DBA/Database Engineer', 'Other','Developer Relations/Advocacy',\
                                         'Data Architect','Developer Advocate','Teacher / professor','Data Administrator', 'Engineer (non-software)'])]
+
+
+
 
     #Occupation 合并
 
@@ -160,8 +191,10 @@ def show_recommendation():
     occupation_map = {occupation: i+1 for i, occupation in enumerate(occupations)}
 
     data['Occupation_Number'] = data['job_title'].map(occupation_map)
-
-    # data['Occupation_Number'].unique()
+    
+    
+    
+    
 
     # filter education
     educations = ['Master’s degree', 'Doctoral degree', 'Bachelor’s degree',
@@ -169,11 +202,18 @@ def show_recommendation():
         'No formal education past high school', 'Professional doctorate']
     # Filter the rows
     data = data[data['highest_education'].isin(educations)]
-
-    # data.groupby('highest_education').count()
+    
+    
+    
+    
 
     data = data.reset_index(drop=True)
-    df = data
+    data = data.drop('Occupation_Number', axis=1)
+
+
+
+
+
 
 
     # model fitting
@@ -185,14 +225,14 @@ def show_recommendation():
     # Encode categorical variables
     label_encoders = {}
     for column in data.columns:
-        if df[column].dtype == object:
+        if data[column].dtype == object:
             le = LabelEncoder()
-            df[column] = le.fit_transform(data[column])
+            data[column] = le.fit_transform(data[column])
             label_encoders[column] = le
 
     # Split the data into features and target variable
-    X = df.drop('job_title', axis=1)  # Replace 'target_column' with your target column name
-    y = df['job_title']
+    X = data.drop('job_title', axis=1)  
+    y = data['job_title']
 
     # Split the dataset into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -221,9 +261,7 @@ def show_recommendation():
         'program_language_used', 'ide_used', 'ml_frameworks_used',
         'ml_algorithms', 'platforms', 'media_sources']
 
-    data = data[usefull]
-    df = df[usefull]
-    df = df.drop("job_title", axis=1)
+    df = data
     ###################################
 
 
@@ -259,9 +297,11 @@ def show_recommendation():
     survey = st.empty()
 
     name = None
-    # age = None
-    # gender = None
-    # degree = None
+    age = None
+    gender = None
+    degree = None
+    TPU = None
+    ml_experience = None
     coding_experience = None
     notebooks = None
     visualization_tools = None
@@ -270,6 +310,8 @@ def show_recommendation():
     IDEs = None
     ml_framework = None
     ml_algorithm = None
+    cv_methods = None
+    NLP = None
     course_platfroms = None
     media_sources = None
 
@@ -277,16 +319,19 @@ def show_recommendation():
 
     if(submitted == False):    
         with survey.form("survey"):
-            st.markdown("Please fill in the following survey. Kindly complete all fields.")
+            st.markdown("Please fill in the following survey. Please be aware that our survey and recommendation model are aimed at people aged 18-40 years.")
             name = st.text_input("**Name**", placeholder="Type in your name...")
             
-            age = st.number_input("**Age**", value= 0)
+            age = st.selectbox(
+                "**Age**: What's your age (# years)?", 
+                ("18-21", "22-24", "30-34", "35-39")
+            )
             
-            gender = st.selectbox("**Gender**", ("Woman", "Man"))
+            gender = st.selectbox("**Gender**: Your biological gender", ("Woman", "Man"))
             
             degree = st.selectbox(
                 "**Highest Degree**: The highest level of formal education that you have attained or plan to attain within the next 2 years.", 
-                ("No formal education past high school", "Some college/university study without earning a bachelor's degree", "Bachelor's degree", "Master's degree", "Doctoral degree", "Professional degree")
+                ("No formal education past high school", "Some college/university study without earning a bachelor’s degree", "Bachelor’s degree", "Master’s degree", "Doctoral degree", "Professional degree")
             )
             
             coding_experience = st.selectbox(
@@ -298,6 +343,47 @@ def show_recommendation():
                     "5-10 years", 
                     "10-20 years", 
                     "20+ years"
+                )
+            )
+                
+            programming_languages = st.multiselect(
+                "**Programming Languages**: What programming languages do you use on a regular basis? (Select all that apply)",
+                (
+                    "Python", 
+                    "R", 
+                    "SQL", 
+                    "C", 
+                    "C++", 
+                    "Java", 
+                    "Javascript", 
+                    "Julia", 
+                    "Swift", 
+                    "Bash", 
+                    "MATLAB", 
+                    "C#", 
+                    "PHP", 
+                    "Go", 
+                    "None", 
+                    "Other"
+                )
+            )
+            
+            IDEs = st.multiselect(
+                "**IDEs**: Which of the following integrated development environments (IDE's) do you use on a regular basis? (Select all that apply)",
+                (
+                    "JupyterLab (or products based off of Jupyter)", 
+                    "RStudio/Posit", 
+                    "Visual Studio", 
+                    "Visual Studio Code (VSCode)", 
+                    "PyCharm", 
+                    "Spyder", 
+                    "Notepad++", 
+                    "Sublime Text", 
+                    "Vim, Emacs, or similar", 
+                    "MATLAB", 
+                    "IntelliJ",
+                    "None", 
+                    "Other"
                 )
             )
             
@@ -326,7 +412,7 @@ def show_recommendation():
                     "Other"
                 )
             )
-
+            
             visualization_tools = st.multiselect(
                 "**Data Visualization Tools**: What data visualization libraries or tools do you use on a regular basis? (Select all that apply)",
                 (
@@ -347,59 +433,16 @@ def show_recommendation():
                     "Other"
                 )
             )
-
-            activities = st.multiselect(
-                "**Expected Role Activities**: Select any activities that you expect it to make up an important part of your role at work: (Select all that apply)",
-                (
-                    "Analyze and understand data to influence product or business decisions", 
-                    "Build and/or run the data infrastructure that my business uses for storing, analyzing, and operationalizing data",
-                    "Build prototypes to explore applying machine learning to new areas",
-                    "Build and/or run a machine learning service that operationally improves my product or workflows",
-                    "Experimentation and iteration to improve existing ML models",
-                    "Do research that advances the state of the art of machine learning",
-                    "Other"
-                )
-            )
             
-            # multiselect会返回一个list
-            programming_languages = st.multiselect(
-                "**Programming Languages**: What programming languages do you use on a regular basis? (Select all that apply)",
+            ml_experience = st.selectbox(
+                "**Machine Learning Experience**: For how many years have you used machine learning methods?",
                 (
-                    "Python", 
-                    "R", 
-                    "SQL", 
-                    "C", 
-                    "C++", 
-                    "Java", 
-                    "Javascript", 
-                    "Julia", 
-                    "Swift", 
-                    "Bash", 
-                    "MATLAB", 
-                    "C#", 
-                    "PHP", 
-                    "Go", 
-                    "None", 
-                    "Other"
-                )
-            )
-
-            IDEs = st.multiselect(
-                "**IDEs**: Which of the following integrated development environments (IDE's) do you use on a regular basis? (Select all that apply)",
-                (
-                    "JupyterLab (or products based off of Jupyter)", 
-                    "RStudio/Posit", 
-                    "Visual Studio", 
-                    "Visual Studio Code (VSCode)", 
-                    "PyCharm", 
-                    "Spyder", 
-                    "Notepad++", 
-                    "Sublime Text", 
-                    "Vim, Emacs, or similar", 
-                    "MATLAB", 
-                    "IntelliJ",
-                    "None", 
-                    "Other"
+                    'I do not use machine learning methods',
+                    'Under 1 year',
+                    '1-3 years',
+                    '3-5 years',
+                    '5-10 years',
+                    '10 or more years'
                 )
             )
             
@@ -427,18 +470,6 @@ def show_recommendation():
                 )
             )
             
-            # ml_experience = st.selectbox(
-            #     "**Machine Learning Experience**: For how many years have you used machine learning methods?",
-            #     ("I do not use machine learning methods", "Under 1 year", "1-2 years", "2-3 years", "3-4 years", "4-5 years", "5-10 years", "10-20 years", "20 or more years")
-            # )
-
-            # expected_salary = st.selectbox(
-            #     "**Expected Salary**: What is your expected yearly compensation? (Approximate **$USD**)",
-            #     ("$0-999", "1,000-1,999", "2,000-2,999", "3,000-3,999", "4,000-4,999", "5,000-7,499", "7,500-9,999", 
-            #     "10,000-14,999", "15,000-19,999", "20,000-24,999", "25,000-29,999", "30,000-39,999", "40,000-49,999", "50,000-59,999", "60,000-69,999", "70,000-79,999", "80,000-89,999", "90,000-99,999",
-            #     "100,000-124,999", "125,000-149,999", "150,000-199,999", "200,000-249,999", "250,000-299,999", "300,000-500,000", "> $500,000")
-            # )
-
             ml_algorithm = st.multiselect(
                 "**Machine Learning Algorithm**: Which of the following ML algorithms do you use on a regular basis? (Select all that apply)",
                 (
@@ -454,6 +485,59 @@ def show_recommendation():
                     "Autoencoder Networks (DAE, VAE, etc)", 
                     "Graph Neural Networks", 
                     "None", 
+                    "Other"
+                )
+            )
+
+            # expected_salary = st.selectbox(
+            #     "**Expected Salary**: What is your expected yearly compensation? (Approximate **$USD**)",
+            #     ("$0-999", "1,000-1,999", "2,000-2,999", "3,000-3,999", "4,000-4,999", "5,000-7,499", "7,500-9,999", 
+            #     "10,000-14,999", "15,000-19,999", "20,000-24,999", "25,000-29,999", "30,000-39,999", "40,000-49,999", "50,000-59,999", "60,000-69,999", "70,000-79,999", "80,000-89,999", "90,000-99,999",
+            #     "100,000-124,999", "125,000-149,999", "150,000-199,999", "200,000-249,999", "250,000-299,999", "300,000-500,000", "> $500,000")
+            # )
+
+
+            
+            cv_methods = st.multiselect(
+                "**Computer Vision Methods**: Which categories of computer vision methods do you use on a regular basis? (Select all that apply)",
+                (
+                    "General purpose image/video tools (PIL, cv2, skimage, etc)",
+                    "Image segmentation methods (U-Net, Mask R-CNN, etc)",
+                    "Object detection methods (YOLOv3, RetinaNet, etc)",
+                    "Image classification and other general purpose networks (VGG, Inception, ResNet, ResNeXt, NASNet, EfficientNet, etc)",
+                    "Vision transformer networks (ViT, DeiT, BiT, BEiT, Swin, etc)",
+                    "Generative Networks (GAN, VAE, etc)",
+                    "None",
+                    "Other"
+                )
+            )
+            
+            NLP = st.multiselect(
+                "**NLP Methods**: Which of the following natural language processing (NLP) methods do you use on a regular basis? (Select all that apply)",
+                (
+                    "Word embeddings/vectors (GLoVe, fastText, word2vec)",
+                    "Encoder-decoder models (seq2seq, vanilla transformers)",
+                    "Contextualized embeddings (ELMo, CoVe)",
+                    "Transformer language models (GPT-3, BERT, XLnet, etc)",
+                    "None",
+                    "Other"
+                )
+            )
+            
+            TPU = st.selectbox(
+                "**TPU Using Times**: Approximately how many times have you used a TPU (tensor processing unit)?",
+                ("Never", "Once", "2-5 times", "6-25 times", "More than 25 times")
+            )
+            
+            activities = st.multiselect(
+                "**Expected Role Activities**: Select any activities that you expect it to make up an important part of your role at work: (Select all that apply)",
+                (
+                    "Analyze and understand data to influence product or business decisions", 
+                    "Build and/or run the data infrastructure that my business uses for storing, analyzing, and operationalizing data",
+                    "Build prototypes to explore applying machine learning to new areas",
+                    "Build and/or run a machine learning service that operationally improves my product or workflows",
+                    "Experimentation and iteration to improve existing ML models",
+                    "Do research that advances the state of the art of machine learning",
                     "Other"
                 )
             )
@@ -499,10 +583,12 @@ def show_recommendation():
                 survey.empty()
 
     if(submitted):
+        if(not name):
+            name = "Hey"
         user_data = {
-            # "Age": age,
-            # "Gender": gender,
-            # "Degree": degree,
+            "age": [age, ],
+            "gender": [gender, ],
+            "highest_education": [degree, ],
             "code_writing_experience": [coding_experience,],
             "hosted_notebook_used": [str(notebooks),],
             "data_vis_used": [str(visualization_tools),],
@@ -512,11 +598,25 @@ def show_recommendation():
             "ml_frameworks_used": ["; ".join(ml_framework),],
             "ml_algorithms": ["; ".join(ml_algorithm),],
             "platforms": ["; ".join(course_platfroms),],
-            "media_sources": ["; ".join(media_sources),]
-            # "Machine learning experience": ml_experience
+            "media_sources": ["; ".join(media_sources),],
+            "TPU": [TPU, ],
+            "ml_experience": [ml_experience,],
+            "computer_vision_methods": [";".join(cv_methods),],
+            "NLP": [";".join(NLP), ]
         }
         user_df = pd.DataFrame(user_data)
         
+        # age
+        age_replace = {
+            "18-21" : 18,
+            "22-24" : 22, 
+            "30-34" : 30, 
+            "35-39" : 35
+        }
+        user_df["age"] = user_df["age"].replace(age_replace)
+        
+        
+        # code_writing_experience
         cwe_replace = {
             "1-3 years": 0,
             "10-20 years": 1,
@@ -525,26 +625,44 @@ def show_recommendation():
             "5-10 years": 4,
             "< 1 years": 5
         }
-        user_df['code_writing_experience'] = df['code_writing_experience'].replace(cwe_replace)
+        user_df['code_writing_experience'] = user_df['code_writing_experience'].replace(cwe_replace)
+        
+        print(user_df)
+        
+        # ml_experience
+        mle_replace = {
+            'I do not use machine learning methods': 0,
+            'Under 1 year': 1,
+            '1-3 years': 2,
+            '3-5 years': 3,
+            '5-10 years': 4,
+            '10 or more years': 5
+        }
+        user_df["ml_experience"] = user_df["ml_experience"].replace(mle_replace)
+        
         
         try:
             for column in user_df.columns:
                 if column in label_encoders:
-                    le = label_encoders[column]
                     print(column)
+                    le = label_encoders[column]
                     user_df[column] = le.transform(user_df[column])
         except Exception as e:
-            st.markdown("### 🙇‍♂️ Sorry, we can't find the recommended job role for you, please go back and try other choices.")
+            print("error in model fitting")
+            print(e)
+            throw_default_roles(name)
+            # st.markdown("### 🙇‍♂️ Sorry, we can't find the recommended job role for you, please go back and try other choices.")
             if(st.button("Back", type="primary")):
                 submitted = False
             return
-            
 
         recommended_jobs = {}
         
         
         
-
+        ########################
+        # logistic regression ##
+        ########################
         from sklearn.preprocessing import StandardScaler, OneHotEncoder
         from sklearn.compose import ColumnTransformer
         from sklearn.feature_extraction.text import CountVectorizer
@@ -552,9 +670,9 @@ def show_recommendation():
         from sklearn.impute import SimpleImputer
         from sklearn.pipeline import Pipeline
         import numpy as np
-        
+
         # Split the original DataFrame first
-        X_train, X_test, y_train, y_test = train_test_split(df, data['job_title'], test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(df.drop('job_title', axis=1), df['job_title'], test_size=0.2, random_state=42)
 
 
         columns_to_exclude = ['job_title']
@@ -573,20 +691,15 @@ def show_recommendation():
             ('imputer', SimpleImputer(strategy='mean')),
             ('scaler', StandardScaler())
         ])
-        
+
         # Bundle preprocessing for numerical and categorical data
         preprocessor = ColumnTransformer(
             transformers=[
                 ('num', numerical_transformer, numerical_cols),
                 ('cat', categorical_transformer, categorical_cols)
             ])
-        
-        # Apply the preprocessing to the training data
         X_train_preprocessed = preprocessor.fit_transform(X_train)
         
-        ########################
-        # logistic regression ##
-        ########################
         try:
             from sklearn.linear_model import LogisticRegression
             from sklearn.metrics import classification_report, confusion_matrix
@@ -613,17 +726,18 @@ def show_recommendation():
             job_ll = job_title_map[user_pred[0]]
             
             if job_ll in recommended_jobs:
-                recommended_jobs[job_ll] = recommended_jobs[job_ll] + 0.35
+                recommended_jobs[job_ll] = recommended_jobs[job_ll] + 0.4
             else:
-                recommended_jobs[job_ll] = 0.35
+                recommended_jobs[job_ll] = 0.4
                 
         except Exception as e:
-            pass
+            print("error in logistic regression")
+            print(e)
         ########################
         
         
         ########################
-        # XGBoost ##############
+        # XGBoost Optimized ####
         ########################
         from sklearn.preprocessing import LabelEncoder
         import xgboost as xgb
@@ -685,11 +799,12 @@ def show_recommendation():
             job_xgboost = job_title_map[user_pred[0]]
         
             if job_xgboost in recommended_jobs:
-                recommended_jobs[job_xgboost] = recommended_jobs[job_xgboost] + 0.49
+                recommended_jobs[job_xgboost] = recommended_jobs[job_xgboost] + 0.5
             else:
-                recommended_jobs[job_xgboost] = 0.49
+                recommended_jobs[job_xgboost] = 0.5
         except Exception as e:
-            pass
+            print("error in XGBoost")
+            print(e)
         
         
         
@@ -725,12 +840,17 @@ def show_recommendation():
             job_rf = job_title_map[user_pred[0]]
         
             if job_rf in recommended_jobs:
-                recommended_jobs[job_rf] = recommended_jobs[job_rf] + 0.46
+                recommended_jobs[job_rf] = recommended_jobs[job_rf] + 0.49
             else:
-                recommended_jobs[job_rf] = 0.46
+                recommended_jobs[job_rf] = 0.49
         except Exception as e:
-            pass
+            print("error in random forest")
+            print(e)
         
+        
+        ##############################
+        # KNN ########################
+        ##############################
         try:
             from sklearn.neighbors import NearestNeighbors
             # Preprocess the data
@@ -774,9 +894,9 @@ def show_recommendation():
                 
             job_knn = job_title_map[user_pred[0]]
             if job_knn in recommended_jobs:
-                recommended_jobs[job_knn] = recommended_jobs[job_knn] + 0.37
+                recommended_jobs[job_knn] = recommended_jobs[job_knn] + 0.39
             else:
-                recommended_jobs[job_knn] = 0.37
+                recommended_jobs[job_knn] = 0.39
 
             # # Calculate the accuracy of the NearestNeighbors model
             # accuracy_nn = accuracy_score(y_test, y_pred_nn)
@@ -784,17 +904,18 @@ def show_recommendation():
             # # Output the accuracy
             # accuracy_nn
         except Exception as e:
-            pass
+            print("error in KNN")
+            print(e)
         
         
         
         
         
-        if(not name):
-            name = "Hey"
             
         if not recommended_jobs:
-            st.markdown("### 🙇‍♂️ Sorry, we can't find the recommended job role for you, please go back and try other choices.")
+            print("error: no valid recommendation")
+            throw_default_roles(name)
+            # st.markdown("### 🙇‍♂️ Sorry, we can't find the recommended job role for you, please go back and try other choices.")
         else:
             role = max(recommended_jobs, key=recommended_jobs.get)
             st.markdown("### " + name +", here are your recommended job roles!")
@@ -882,7 +1003,7 @@ def show_models():
 
 
 user_choose = st.sidebar.radio(
-    "In recommendation, you'll fill in a technical survey, and be showed the recommended jobs. In models, you can explore the recommendation models we used.",
+    "In recommendation, you'll fill in a technical background survey, then be showed the recommended jobs based on your survey. In recommendation models, you can explore the recommendation models we used.",
     ["***Recommendation***", 
      "***Recommendation Models***"],
     captions = ["Get Your Job Role Recommendation", "Know More About The Recommendation Models"]
