@@ -327,7 +327,7 @@ def show_recommendation():
                 ("18-21", "22-24", "30-34", "35-39")
             )
             
-            gender = st.selectbox("**Gender**: Your biological gender", ("Woman", "Man"))
+            gender = st.selectbox("**Gender**: Your biological gender.", ("Woman", "Man"))
             
             degree = st.selectbox(
                 "**Highest Degree**: The highest level of formal education that you have attained or plan to attain within the next 2 years.", 
@@ -969,36 +969,52 @@ def show_models():
     st.markdown("#### We use 4 different models to do the recommendation, and our recommendation is ranked based on the accuracy of each model.")
     
     st.markdown("##### Logistic Regression")
-    col_icon, col_text = st.columns([0.3, 0.7])
+    col_icon, col_text = st.columns([0.3, 0.7], gap="large")
     with col_icon:
         image = Image.open("./pictures/lr_icon.png")
         st.image(image) 
     with col_text:
-        st.markdown("some description .......(from report)")
+        st.markdown("###### Model Description")
+        st.markdown("Logistic regression makes predictions by applying a logistic function to a linear combination of the input features.")
+        st.markdown(" ")
+        st.markdown("###### Model Metric")
+        st.markdown("- Accuracy: 41%")
     
     st.markdown("##### XGBoost")
-    col_icon, col_text = st.columns([0.3, 0.7])
+    col_icon, col_text = st.columns([0.3, 0.7], gap="large")
     with col_icon:
         image = Image.open("./pictures/xgb_icon.png")
         st.image(image) 
     with col_text:
-        st.markdown("some description .......(from report)")
+        st.markdown("###### Model Description")
+        st.markdown("XGBoost iteratively combines weak learners to enhance accuracy and handle complex relationships.")
+        st.markdown(" ")
+        st.markdown("###### Model Metric")
+        st.markdown("- Accuracy: 50%")
         
     st.markdown("##### Random Forest")
-    col_icon, col_text = st.columns([0.3, 0.7])
+    col_icon, col_text = st.columns([0.3, 0.7], gap="large")
     with col_icon:
         image = Image.open("./pictures/rf_icon.png")
         st.image(image) 
     with col_text:
-        st.markdown("some description .......(from report)")
+        st.markdown("###### Model Description")
+        st.markdown("Random forest builds a multitude of decision trees during training, and outputs the mode of the classes for classification, resulting in a robust and accurate predictive model.")
+        st.markdown(" ")
+        st.markdown("###### Model Metric")
+        st.markdown("- Accuracy: 47.4%")
         
     st.markdown("##### KNN")
-    col_icon, col_text = st.columns([0.3, 0.7])
+    col_icon, col_text = st.columns([0.3, 0.7], gap="large")
     with col_icon:
         image = Image.open("./pictures/knn_icon.png")
         st.image(image) 
     with col_text:
-        st.markdown("some description .......(from report)")
+        st.markdown("###### Model Description")
+        st.markdown("K-Nearest Neighbors classifies a data point based on the majority class of its k-nearest neighbors in the feature space.")
+        st.markdown(" ")
+        st.markdown("###### Model Metric")
+        st.markdown("- Accuracy: 40.1%")
 
 
 

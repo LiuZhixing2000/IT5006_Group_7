@@ -125,8 +125,7 @@ def show_1():
     df_inner = df_inner[["2020 Salary", "2021 Salary", "2022 Salary"]]
     #plt.figure(figsize=(14,6))
     #plt.title('Average earnings by occupation in 2020-2022',fontsize=20)
-    st.markdown("## 1.1 Trend over Time")
-    st.markdown("### 1.1.1 Trend of Average Earnings")
+    st.markdown("## Trend over Time")
     st.subheader('Average earnings by occupation in 2020-2022', divider='rainbow')
 
     #plt.xlabel(u'year',fontsize=14)
@@ -212,8 +211,7 @@ def show_2():
     df = df.iloc[[2, 5, 8], :]
     #plt.figure(figsize=(14,6))
     #plt.title('The average proportion of DS job demand in each country',fontsize=20)
-    st.markdown("## 1.1 Trend over Time")
-    st.markdown("### 1.1.2 Trend of DS Job Demand")
+    st.markdown("## Trend over Time")
     st.subheader('The average proportion of DS job demand in each country', divider='rainbow')
     #plt.xlabel(u'Country',fontsize=14)
     #plt.ylabel(u'Need Ratio',fontsize=14)
@@ -370,8 +368,7 @@ def show_3():
     col2020_1_2_1.rename(columns={"1-2 years": "1-3 years"}, inplace=True)
 
 
-    st.markdown("## 1.2 Statistical Tendencies")
-    st.markdown("### 1.2.1 Salary Tendency")
+    st.markdown("## Statistical Tendencies")
     st.subheader("Salary of Occupations by Coding Experience", divider='rainbow')
 
     # select by user
@@ -688,8 +685,7 @@ def show_4():
     ax.tick_params(axis="y",labelsize=12)
     ax.set_title('YEAR 2022', fontsize=18, position=(0.5,1.05))
 
-    st.markdown("## 1.2 Statistical Tendencies")
-    st.markdown("### 1.2.2 Coding Lauunguages and Coding Experience Tendency")
+    st.markdown("## Statistical Tendencies")
     st.subheader('The relationship between the code languages and coding experience', divider="rainbow")
 
     with st.container():
